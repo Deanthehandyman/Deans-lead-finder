@@ -1,5 +1,6 @@
 import csv
 import requests
+import os
 
 # =========================
 # YOUR KEYS - READY TO RUN
@@ -41,9 +42,8 @@ QUERIES = [
     '"campground" Shreveport LA',
 ]
 
-
 # =========================
-# CORE FUNCTIONS (DON'T CHANGE)
+# CORE FUNCTIONS
 # =========================
 
 def google_search(query, num_results=20):
@@ -85,7 +85,7 @@ def google_search(query, num_results=20):
     return results
 
 
-def build_leads_csv(queries, filename="google_leads.csv", num_results=25):
+def build_leads_csv(queries, filename="/sdcard/Download/google_leads.csv", num_results=25):
     all_results = []
 
     for q in queries:
@@ -102,7 +102,8 @@ def build_leads_csv(queries, filename="google_leads.csv", num_results=25):
             seen_links.add(link)
             unique_results.append(r)
 
-    # Save to CSV
+    # Save directly to Downloads
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Title", "URL", "Snippet", "Query"])
@@ -118,4 +119,4 @@ def build_leads_csv(queries, filename="google_leads.csv", num_results=25):
 
 
 if __name__ == "__main__":
-    build_leads_csv(QUERIES, filename="google_leads.csv", num_results=RESULTS_PER_QUERY)
+    build_leads_csv(QUERIES)
