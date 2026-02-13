@@ -2,39 +2,57 @@ import csv
 import requests
 
 # =========================
-# CONFIG - FILL THESE IN
+# YOUR KEYS - READY TO RUN
 # =========================
 
-API_KEY = "YOUR_GOOGLE_API_KEY_HERE"
-SEARCH_ENGINE_ID = "YOUR_SEARCH_ENGINE_ID_HERE"
+API_KEY = "b3480a1c72a209050d4c9c45338f5eb6efa36f28"
+SEARCH_ENGINE_ID = "e307169415f8e4471"
 
 # How many results to try to pull per query (Google may return fewer)
 RESULTS_PER_QUERY = 25
 
-# Your target queries for leads
+# Target queries for Pittsburg + ~200 miles (East TX, AR, LA, OK)
 QUERIES = [
+    # Core around Pittsburg
     '"property management" Pittsburg TX',
+    '"property management" Mount Pleasant TX',
+    '"property management" Longview TX',
+    '"property management" Tyler TX',
+    '"property management" Texarkana TX',
+    '"property management" Sulphur Springs TX',
+
+    # Mobile home & RV within that radius
     '"mobile home park" near Pittsburg TX',
+    '"mobile home park" East Texas',
+    '"RV park" near Pittsburg TX',
     '"RV park" East Texas',
+
+    # Campgrounds / rural spots
     '"campground" East Texas',
+    '"campground" near Pittsburg TX',
+    '"lake cabin rentals" East Texas',
+
+    # Cross-border within 200 miles (AR / LA / OK)
+    '"property management" Shreveport LA',
+    '"property management" Texarkana AR',
+    '"property management" Idabel OK',
+    '"RV park" Shreveport LA',
+    '"RV park" Texarkana AR',
+    '"campground" Shreveport LA',
 ]
 
 
 # =========================
-# CORE FUNCTIONS
+# CORE FUNCTIONS (DON'T CHANGE)
 # =========================
 
 def google_search(query, num_results=20):
-    """
-    Uses Google Custom Search JSON API to get results for a query.
-    Searches only the sites you configured in your Programmable Search Engine.
-    """
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "key": API_KEY,
         "cx": SEARCH_ENGINE_ID,
         "q": query,
-        "num": 10,  # max per page
+        "num": 10,
     }
 
     results = []
@@ -59,7 +77,6 @@ def google_search(query, num_results=20):
             if fetched >= num_results:
                 break
 
-        # pagination
         next_page = data.get("queries", {}).get("nextPage", [])
         if not next_page:
             break
