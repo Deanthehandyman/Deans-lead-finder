@@ -3,7 +3,7 @@ import requests
 import os
 
 # =========================
-# YOUR KEYS
+# YOUR GOOGLE KEYS
 # =========================
 
 API_KEY = "b3480a1c72a209050d4c9c45338f5eb6efa36f28"
@@ -12,52 +12,55 @@ SEARCH_ENGINE_ID = "e307169415f8e4471"
 RESULTS_PER_QUERY = 25
 
 # =========================
-# QUERIES: REAL PEOPLE POSTS
+# QUERIES: PEOPLE ASKING FOR HELP (50 domains)
 # =========================
 
 QUERIES = [
-    # General "need a handyman" posts
+    # Handyman help wanted
     '"need a handyman" "TX"',
     '"looking for a handyman" "Texas"',
     '"handyman recommendation" "Pittsburg TX"',
     '"good handyman" "East Texas"',
     '"handyman near me" "Pittsburg Texas"',
-
-    # Facebook / Nextdoor style
+    
+    # Facebook/Nextdoor posts
     '"who can fix" "leak" "Texas"',
     '"anyone know a handyman" "TX"',
     '"can anyone recommend" "handyman" "Texas"',
     '"need someone to fix" "house" "Texas"',
-
-    # Reddit / forum style
+    
+    # Forum/Reddit complaints
     '"cant find a handyman" "Texas"',
     '"having trouble finding help" "home repairs"',
     '"how do I find a contractor" "Texas"',
     '"need help with home repairs"',
-
-    # Internet / Starlink
+    
+    # Internet/Starlink
     '"slow internet" "rural" "Texas"',
     '"Starlink install" "who can" "TX"',
     '"need help installing Starlink"',
-
-    # Rentals / landlord issues
+    
+    # Rental/landlord
     '"landlord wont fix" "Texas"',
     '"rental repair" "need someone" "TX"',
-
-    # Ranch / farm / rural
+    '"tenant repair" "handyman"',
+    
+    # Ranch/farm/rural
     '"fence repair" "East Texas"',
     '"barn repair" "Texas"',
     '"ranch maintenance" "need help" "TX"',
+    
+    # Repair problems
+    '"roof leak" "recommend" "Texas"',
+    '"plumber needed" "East Texas"',
+    '"electrician wanted" "Pittsburg"',
 ]
 
 # =========================
-# FUNCTIONS
+# GOOGLE SEARCH
 # =========================
 
 def google_search(query, num_results=20):
-    """
-    Use Google Custom Search JSON API against your 50 domains.
-    """
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "key": API_KEY,
@@ -96,11 +99,11 @@ def google_search(query, num_results=20):
     return results
 
 
-def build_leads_csv(
-    queries,
-    filename="/sdcard/Download/forum_leads.csv",
-    num_results=RESULTS_PER_QUERY,
-):
+# =========================
+# SAVE TO DOWNLOADS
+# =========================
+
+def build_leads_csv(queries, filename="/sdcard/Download/forum_leads.csv", num_results=25):
     all_results = []
 
     for q in queries:
@@ -108,7 +111,6 @@ def build_leads_csv(
         rs = google_search(q, num_results=num_results)
         all_results.extend(rs)
 
-    # De-duplicate by URL
     seen_links = set()
     unique_results = []
     for r in all_results:
@@ -117,7 +119,6 @@ def build_leads_csv(
             seen_links.add(link)
             unique_results.append(r)
 
-    # Ensure Downloads path exists and save file
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -130,7 +131,7 @@ def build_leads_csv(
                 r.get("query", ""),
             ])
 
-    print(f"✅ SAVED {len(unique_results)} FORUM LEADS to {filename}")
+    print(f"✅ SAVED {len(unique_results)} LEADS to {filename}")
 
 
 if __name__ == "__main__":
