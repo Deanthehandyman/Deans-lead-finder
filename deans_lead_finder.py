@@ -11,27 +11,43 @@ SEARCH_ENGINE_ID = "e307169415f8e4471"
 
 RESULTS_PER_QUERY = 25
 
-# TARGET: Homeowners posting HELP requests in forums/groups
+# =========================
+# QUERIES: REAL PEOPLE POSTS
+# =========================
+
 QUERIES = [
-    # Facebook groups / local posts
-    '"need handyman" OR "looking for handyman" Pittsburg TX',
-    '"recommend handyman" OR "good handyman" East Texas',
-    '"handyman needed" OR "need repairs" Tyler TX',
-    '"looking for handyman" OR "need house repair" Longview TX',
-    '"handyman recommendation" Mount Pleasant TX',
-    
-    # Forums asking for help
-    '"need plumber" OR "need electrician" Shreveport LA',
-    '"roof leak" OR "fix my house" Texarkana',
-    '"slow internet" OR "internet problems" rural Texas',
-    
-    # Rental/homeowner issues (no apostrophe to avoid error)
-    '"landlord wont fix" OR "rental repair" East Texas',
-    '"HOA repair" OR "neighbor handyman" Pittsburg',
-    
-    # Ranch/farm/rural specific
-    '"barn repair" OR "fence fix" East Texas',
-    '"ranch maintenance" OR "farm help" Tyler TX',
+    # General "need a handyman" posts
+    '"need a handyman" "TX"',
+    '"looking for a handyman" "Texas"',
+    '"handyman recommendation" "Pittsburg TX"',
+    '"good handyman" "East Texas"',
+    '"handyman near me" "Pittsburg Texas"',
+
+    # Facebook / Nextdoor style
+    '"who can fix" "leak" "Texas"',
+    '"anyone know a handyman" "TX"',
+    '"can anyone recommend" "handyman" "Texas"',
+    '"need someone to fix" "house" "Texas"',
+
+    # Reddit / forum style
+    '"cant find a handyman" "Texas"',
+    '"having trouble finding help" "home repairs"',
+    '"how do I find a contractor" "Texas"',
+    '"need help with home repairs"',
+
+    # Internet / Starlink
+    '"slow internet" "rural" "Texas"',
+    '"Starlink install" "who can" "TX"',
+    '"need help installing Starlink"',
+
+    # Rentals / landlord issues
+    '"landlord wont fix" "Texas"',
+    '"rental repair" "need someone" "TX"',
+
+    # Ranch / farm / rural
+    '"fence repair" "East Texas"',
+    '"barn repair" "Texas"',
+    '"ranch maintenance" "need help" "TX"',
 ]
 
 # =========================
@@ -39,6 +55,9 @@ QUERIES = [
 # =========================
 
 def google_search(query, num_results=20):
+    """
+    Use Google Custom Search JSON API against your 50 domains.
+    """
     url = "https://www.googleapis.com/customsearch/v1"
     params = {
         "key": API_KEY,
@@ -77,7 +96,11 @@ def google_search(query, num_results=20):
     return results
 
 
-def build_leads_csv(queries, filename="/sdcard/Download/forum_leads.csv", num_results=25):
+def build_leads_csv(
+    queries,
+    filename="/sdcard/Download/forum_leads.csv",
+    num_results=RESULTS_PER_QUERY,
+):
     all_results = []
 
     for q in queries:
@@ -85,6 +108,7 @@ def build_leads_csv(queries, filename="/sdcard/Download/forum_leads.csv", num_re
         rs = google_search(q, num_results=num_results)
         all_results.extend(rs)
 
+    # De-duplicate by URL
     seen_links = set()
     unique_results = []
     for r in all_results:
@@ -93,6 +117,7 @@ def build_leads_csv(queries, filename="/sdcard/Download/forum_leads.csv", num_re
             seen_links.add(link)
             unique_results.append(r)
 
+    # Ensure Downloads path exists and save file
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
