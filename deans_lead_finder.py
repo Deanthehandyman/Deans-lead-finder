@@ -25,8 +25,8 @@ QUERIES = [
     '"roof leak" OR "fix my house" Texarkana',
     '"slow internet" OR "internet problems" rural Texas',
     
-    # Rental/homeowner issues
-    '"landlord won't fix" OR "rental repair" East Texas',
+    # Rental/homeowner issues (no apostrophe to avoid error)
+    '"landlord wont fix" OR "rental repair" East Texas',
     '"HOA repair" OR "neighbor handyman" Pittsburg',
     
     # Ranch/farm/rural specific
